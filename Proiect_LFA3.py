@@ -85,38 +85,72 @@ class Automat:
             cSubsets = dict(zip(lKeys, list(cSubsets.values())))
             print(nSubsets)
             print(cSubsets)
+            
 
         self.subsets = copy.deepcopy(cSubsets)
 
+        cStari = [x for x in self.subsets.keys()]
+        
+        cStareInit = ""
+        for mult in self.subsets.keys():
+            if self.stareInit in self.subsets[mult]:
+                cStareInit = mult
+        
+        cMatriceTranzitii = [["" for x in range(len(self.alfabet))] for i in range(len(cStari))] 
 
+        for stare in cStari:
+            nod = list(self.subsets[stare])[0]
+            for i in range(len(self.matriceTranzitii[self.stari.index(nod)])):
+                for mult in self.subsets.keys():
+                    if self.matriceTranzitii[self.stari.index(nod)][i] in self.subsets[mult]:
+                        cMatriceTranzitii[cStari.index(stare)][i] = mult
+
+        cStariFinale = list()
+
+        for elem in self.stariFinale:
+            for mult in self.subsets.keys():
+                if elem in self.subsets[mult]:
+                    cStariFinale.append(mult)
+        
+        self.stari = copy.deepcopy(cStari)
+        self.stariFinale = copy.deepcopy(cStariFinale)
+        self.matriceTranzitii = copy.deepcopy(cMatriceTranzitii)
+        self.stareInit = copy.deepcopy(cStareInit)
 
         return
-
-
-
-
-        
+    
     #afisam datele dupa citire
-    def printData(self):
+    def printData(self, fisier=""):
 
         print("Stari:")
-        print(self.stari)
+        print(*self.stari)
         print("Alfabet:")
-        print(self.alfabet)
+        print("".join(x for x in self.alfabet))
+        print("Matrice: ")
+        for i in range(len(self.stari)):
+             for j in range(len(self.alfabet)):
+                 if self.matriceTranzitii[i][j] != "":
+                     print(self.stari[i] + " " + self.alfabet[j] + " " + self.matriceTranzitii[i][j])
         print("Stare initiala:")
         print(self.stareInit)
         print("Stari finale:")
-        print(self.stariFinale)
-        print("A0:")
-        print(self.subsets["A0"])
-        print("B0:")
-        print(self.subsets["B0"])
-        print("Matrice: ")
+        print("".join(x for x in self.stariFinale))
 
-        for i in self.matriceTranzitii:
-            for j in i:
-                print(j, end=' ')
-            print()
+        if (fisier != ""):
+            with open(fisier, "w") as output:
+                output.write(" ".join(self.stari) + "\n")
+                output.write("".join(self.alfabet) + "\n")
+
+                for i in range(len(self.stari)):
+                    for j in range(len(self.alfabet)):
+                        if self.matriceTranzitii[i][j] != "":
+                            output.write("".join(self.stari[i]) + " ")
+                            output.write(self.alfabet[j] + " ")
+                            output.write("".join(self.matriceTranzitii[i][j]) + '\n')
+                output.write("".join(self.stareInit) + '\n')
+                for i in range(len(self.stariFinale)):
+                    output.write("".join(self.stariFinale) + " ")
+
 
         #print(self.lambdaInchidere)
 
@@ -126,3 +160,4 @@ if __name__ == "__main__":
     x.readAutomat("automat.txt")
     #x.printData()
     x.splitStates()
+    x.printData("minDFA.txt")
