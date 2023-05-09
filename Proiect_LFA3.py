@@ -44,16 +44,38 @@ class Automat:
 
             self.stareInit = self.aux[-2].strip('\n')
             self.stariFinale = [x for x in self.aux[-1].split()]
-            self.subsets["A0"] = {x for x in self.stari}
-            self.subsets["B0"] = {x for x in self.stariFinale}
-            #print(self.subsets["A0"])
-            for x in self.stariFinale:
-                self.subsets["A0"].remove(x)
-                
+            
+            stariBune = [self.stareInit]
+            cStariBune = list()
+            while stariBune != cStariBune:
+                for el in stariBune:
+                    for i in range(len(self.alfabet)):
+                        if self.matriceTranzitii[self.stari.index(el)][i] != "":
+                            if self.matriceTranzitii[self.stari.index(el)][i] not in stariBune:
+                                stariBune.append(self.matriceTranzitii[self.stari.index(el)][i])
+                cStariBune = stariBune
+
+            cMatriceTranzitii = [["" for x in range(len(self.alfabet))] for i in range(len(stariBune))]
+            for i in range(len(stariBune)):
+                cMatriceTranzitii[i] = copy.deepcopy(self.matriceTranzitii[self.stari.index(stariBune[i])])
+            self.matriceTranzitii = copy.deepcopy(cMatriceTranzitii)
+            self.stari = copy.deepcopy(stariBune)
+
 
         return
+            
+
     
+    def firstSubset(self):
+        self.subsets["A0"] = {x for x in self.stari}
+        self.subsets["B0"] = {x for x in self.stariFinale}
+        #print(self.subsets["A0"])
+        for x in self.stariFinale:
+            self.subsets["A0"].remove(x)
+
     def splitStates(self):
+
+        self.firstSubset()
         
         cSubsets = copy.deepcopy(self.subsets)
         nSubsets = dict()
@@ -83,8 +105,6 @@ class Automat:
             lKeys = [chr(i) + "0" for i in range(ord("A"), ord("A") + len(cSubsets))]
             #print(lKeys)
             cSubsets = dict(zip(lKeys, list(cSubsets.values())))
-            print(nSubsets)
-            print(cSubsets)
             
 
         self.subsets = copy.deepcopy(cSubsets)
@@ -110,8 +130,8 @@ class Automat:
         for elem in self.stariFinale:
             for mult in self.subsets.keys():
                 if elem in self.subsets[mult]:
-                    cStariFinale.append(mult)
-        
+                    if mult not in cStariFinale:
+                        cStariFinale.append(mult)
         self.stari = copy.deepcopy(cStari)
         self.stariFinale = copy.deepcopy(cStariFinale)
         self.matriceTranzitii = copy.deepcopy(cMatriceTranzitii)
@@ -126,7 +146,7 @@ class Automat:
         print(*self.stari)
         print("Alfabet:")
         print("".join(x for x in self.alfabet))
-        print("Matrice: ")
+        print("Tranzitii: ")
         for i in range(len(self.stari)):
              for j in range(len(self.alfabet)):
                  if self.matriceTranzitii[i][j] != "":
